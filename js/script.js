@@ -421,7 +421,7 @@ function renderHero() {
         <div class="hero-actions">
           <a href="#menu" class="btn btn-primary">Explore the menu</a>
           <a href="#" class="btn btn-whatsapp" data-order-whatsapp>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.198-.008-.371.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             Order on WhatsApp
           </a>
         </div>
@@ -439,10 +439,62 @@ function renderHero() {
       </div>
     </div>
   `;
+  startHeroBackgroundCarousel();
+}
+
+const heroBackgrounds = [
+  "https://i.pinimg.com/736x/ef/74/a4/ef74a4a26f5fd3980a5212b0bf33c3fc.jpg",
+  "https://i.pinimg.com/736x/09/4e/6e/094e6ee4e6c89cfcb77d0a358625198c.jpg",
+  "https://i.pinimg.com/736x/0c/f0/fa/0cf0fac05fc73109bed490cedda343b5.jpg",
+];
+
+let heroBackgroundIndex = 0;
+let heroBackgroundTimer;
+
+function advanceHeroBackground() {
+  const background = document.querySelector(".hero-bg");
+  if (!background) return;
+
+  heroBackgroundIndex = (heroBackgroundIndex + 1) % heroBackgrounds.length;
+  background.classList.add("is-changing");
+  setTimeout(() => {
+    background.style.backgroundImage = `url("${heroBackgrounds[heroBackgroundIndex]}")`;
+    background.classList.remove("is-changing");
+  }, 220);
+}
+
+function startHeroBackgroundCarousel() {
+  clearInterval(heroBackgroundTimer);
+  const background = document.querySelector(".hero-bg");
+  if (background) {
+    background.style.backgroundImage = `url("${heroBackgrounds[0]}")`;
+  }
+  heroBackgroundTimer = setInterval(advanceHeroBackground, 4500);
 }
 
 function renderFeatured() {
   const el = document.getElementById("featured");
+  el.innerHTML = `
+    <div class="container">
+      <div class="featured-header reveal">
+        <div class="section-label"><i data-lucide="star"></i>Our Specials</div>
+        <h2 class="section-title">Crowd Favourites &amp; Chef's Picks</h2>
+        <p class="section-subtitle" style="margin:0 auto">Handpicked dishes our customers can't stop ordering. Fresh, bold and unforgettable.</p>
+      </div>
+      <div class="featured-showcase" id="featuredShowcase">
+        <div class="featured-showcase-copy" id="featuredShowcaseCopy"></div>
+        <div class="featured-showcase-media">
+          <img id="featuredShowcaseImage" src="" alt="" loading="eager">
+        </div>
+        <button class="featured-next" type="button" data-featured-next aria-label="Next featured dish">
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
+  updateFeaturedCarousel();
+  return;
+
   el.innerHTML = `
     <div class="container">
       <div class="featured-header reveal">
@@ -457,7 +509,8 @@ function renderFeatured() {
           <button class="tab-btn" data-featured-filter="Chef's Pick">Chef's Pick</button>
         </div>
       </div>
-      <div class="featured-grid" id="featuredGrid">
+      <div class="featured-carousel">
+        <div class="featured-grid" id="featuredGrid">
         ${featuredItems
           .map(
             (item, i) => `
@@ -480,9 +533,49 @@ function renderFeatured() {
         `,
           )
           .join("")}
+        </div>
+        <button class="featured-next" type="button" data-featured-next aria-label="Next featured dish">
+          <i data-lucide="arrow-right"></i>
+        </button>
       </div>
     </div>
   `;
+  updateFeaturedCarousel();
+}
+
+let featuredCarouselIndex = 0;
+let featuredCarouselTimer;
+
+function updateFeaturedCarousel() {
+  const item = featuredItems[featuredCarouselIndex];
+  const copy = document.getElementById("featuredShowcaseCopy");
+  const image = document.getElementById("featuredShowcaseImage");
+  if (!item || !copy || !image) return;
+
+  copy.innerHTML = `
+    <span class="featured-showcase-badge">${item.badge || "Made fresh today"}</span>
+    <h3 class="featured-showcase-title">${item.name}</h3>
+    <p class="featured-showcase-desc">${item.desc}</p>
+    <div class="featured-showcase-meta">
+      <strong>${item.price}</strong>
+      <a href="#" class="btn btn-primary" data-order-item="${item.name}">
+        <i data-lucide="message-circle"></i>Order now
+      </a>
+    </div>
+  `;
+  image.src = item.img;
+  image.alt = item.name;
+  refreshIcons();
+}
+
+function advanceFeaturedCarousel() {
+  featuredCarouselIndex = (featuredCarouselIndex + 1) % featuredItems.length;
+  updateFeaturedCarousel();
+}
+
+function startFeaturedCarousel() {
+  clearInterval(featuredCarouselTimer);
+  featuredCarouselTimer = setInterval(advanceFeaturedCarousel, 3200);
 }
 
 window.filterFeatured = function (btn, filter) {
@@ -490,11 +583,13 @@ window.filterFeatured = function (btn, filter) {
     .querySelectorAll(".featured-tabs .tab-btn")
     .forEach((b) => b.classList.remove("active"));
   btn.classList.add("active");
+  featuredCarouselIndex = 0;
   document.querySelectorAll("#featuredGrid .featured-card").forEach((card) => {
     const badge = card.dataset.badge;
     const show = filter === "all" || badge === filter;
     card.style.display = show ? "" : "none";
   });
+  updateFeaturedCarousel();
 };
 
 // === RENDER: MENU ===
@@ -880,6 +975,13 @@ function hideLoader() {
 
 function initInteractions() {
   document.addEventListener("click", (event) => {
+    const featuredNext = event.target.closest("[data-featured-next]");
+    if (featuredNext) {
+      advanceFeaturedCarousel();
+      startFeaturedCarousel();
+      return;
+    }
+
     const orderLink = event.target.closest("[data-order-whatsapp]");
     if (orderLink) {
       event.preventDefault();
@@ -923,6 +1025,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderNavbar();
   renderHero();
   renderFeatured();
+  startFeaturedCarousel();
   renderMenu();
   renderAbout();
   renderTestimonials();
