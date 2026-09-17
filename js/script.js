@@ -212,28 +212,28 @@ const featuredItems = [
     name: "Jollof Rice + Chicken",
     desc: "Our signature smoky jollof with a full chicken quarter and coleslaw — the crowd's number one choice.",
     price: "₦3,500",
-    img: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=1200&q=90",
+    img: "https://i.pinimg.com/736x/ef/74/a4/ef74a4a26f5fd3980a5212b0bf33c3fc.jpg",
     badge: "Best Seller",
   },
   {
     name: "Suya Platter",
     desc: "Spiced beef skewers, fire-grilled to perfection with yaji spice, fresh onions and tomato salsa.",
     price: "₦3,500",
-    img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&q=90",
+    img: "https://i.pinimg.com/736x/09/4e/6e/094e6ee4e6c89cfcb77d0a358625198c.jpg",
     badge: "Fan Favourite",
   },
   {
     name: "Shawarma Special",
     desc: "Loaded chicken shawarma with house garlic sauce, pickled cabbage and fresh tomatoes.",
     price: "₦2,500",
-    img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=1200&q=90",
+    img: "https://i.pinimg.com/736x/0c/f0/fa/0cf0fac05fc73109bed490cedda343b5.jpg",
     badge: "Today's Special",
   },
   {
     name: "Egusi Soup + Pounded Yam",
     desc: "Our richly-made egusi with assorted meat and pounded yam — the true Nigerian classic.",
     price: "₦4,000",
-    img: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=1200&q=90",
+    img: "https://i.pinimg.com/736x/50/72/7d/50727d54645dd28cd4fb78a850b1afca.jpg",
     badge: "Most Ordered",
   },
   {
@@ -356,7 +356,6 @@ function renderNavbar() {
     <div class="container">
       <div class="nav-inner">
         <a href="#hero" class="nav-logo">
-          <div class="nav-logo-icon"><i data-lucide="chef-hat"></i></div>
           <div class="nav-logo-text">
             <span class="nav-logo-name">Naija Tastee Kitchen</span>
             <span class="nav-logo-tagline">Authentic Nigerian Flavours</span>
@@ -372,7 +371,7 @@ function renderNavbar() {
         <li class="nav-links nav-cta" style="list-style:none">
           <a href="#" data-order-whatsapp><i data-lucide="message-circle"></i>Order Now</a>
         </li>
-        <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -389,9 +388,11 @@ function renderNavbar() {
   const mobileNav = document.getElementById("mobileNav");
   const overlay = document.getElementById("mobileOverlay");
   ham.addEventListener("click", () => {
-    ham.classList.toggle("open");
-    mobileNav.classList.toggle("open");
-    overlay.classList.toggle("active");
+    const isOpen = ham.classList.toggle("open");
+    mobileNav.classList.toggle("open", isOpen);
+    overlay.classList.toggle("active", isOpen);
+    ham.setAttribute("aria-expanded", String(isOpen));
+    ham.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
   });
   overlay.addEventListener("click", closeMobileNav);
   mobileNav
@@ -401,6 +402,8 @@ function renderNavbar() {
     ham.classList.remove("open");
     mobileNav.classList.remove("open");
     overlay.classList.remove("active");
+    ham.setAttribute("aria-expanded", "false");
+    ham.setAttribute("aria-label", "Open menu");
   }
 }
 
@@ -439,37 +442,6 @@ function renderHero() {
       </div>
     </div>
   `;
-  startHeroBackgroundCarousel();
-}
-
-const heroBackgrounds = [
-  "https://i.pinimg.com/736x/ef/74/a4/ef74a4a26f5fd3980a5212b0bf33c3fc.jpg",
-  "https://i.pinimg.com/736x/09/4e/6e/094e6ee4e6c89cfcb77d0a358625198c.jpg",
-  "https://i.pinimg.com/736x/0c/f0/fa/0cf0fac05fc73109bed490cedda343b5.jpg",
-];
-
-let heroBackgroundIndex = 0;
-let heroBackgroundTimer;
-
-function advanceHeroBackground() {
-  const background = document.querySelector(".hero-bg");
-  if (!background) return;
-
-  heroBackgroundIndex = (heroBackgroundIndex + 1) % heroBackgrounds.length;
-  background.classList.add("is-changing");
-  setTimeout(() => {
-    background.style.backgroundImage = `url("${heroBackgrounds[heroBackgroundIndex]}")`;
-    background.classList.remove("is-changing");
-  }, 220);
-}
-
-function startHeroBackgroundCarousel() {
-  clearInterval(heroBackgroundTimer);
-  const background = document.querySelector(".hero-bg");
-  if (background) {
-    background.style.backgroundImage = `url("${heroBackgrounds[0]}")`;
-  }
-  heroBackgroundTimer = setInterval(advanceHeroBackground, 4500);
 }
 
 function renderFeatured() {
@@ -546,13 +518,19 @@ function renderFeatured() {
 let featuredCarouselIndex = 0;
 let featuredCarouselTimer;
 
-function updateFeaturedCarousel() {
+function updateFeaturedCarousel(animate = false) {
   const item = featuredItems[featuredCarouselIndex];
   const copy = document.getElementById("featuredShowcaseCopy");
   const image = document.getElementById("featuredShowcaseImage");
-  if (!item || !copy || !image) return;
+  const showcase = document.getElementById("featuredShowcase");
+  if (!item || !copy || !image || !showcase) return;
 
-  copy.innerHTML = `
+  if (animate) {
+    showcase.classList.add("is-changing");
+  }
+
+  const renderSlide = () => {
+    copy.innerHTML = `
     <span class="featured-showcase-badge">${item.badge || "Made fresh today"}</span>
     <h3 class="featured-showcase-title">${item.name}</h3>
     <p class="featured-showcase-desc">${item.desc}</p>
@@ -563,19 +541,28 @@ function updateFeaturedCarousel() {
       </a>
     </div>
   `;
-  image.src = item.img;
-  image.alt = item.name;
-  refreshIcons();
+    image.src = item.img;
+    image.alt = item.name;
+    showcase.style.backgroundImage = `url("${item.img}")`;
+    refreshIcons();
+    showcase.classList.remove("is-changing");
+  };
+
+  if (animate) {
+    setTimeout(renderSlide, 320);
+  } else {
+    renderSlide();
+  }
 }
 
 function advanceFeaturedCarousel() {
   featuredCarouselIndex = (featuredCarouselIndex + 1) % featuredItems.length;
-  updateFeaturedCarousel();
+  updateFeaturedCarousel(true);
 }
 
 function startFeaturedCarousel() {
   clearInterval(featuredCarouselTimer);
-  featuredCarouselTimer = setInterval(advanceFeaturedCarousel, 3200);
+  featuredCarouselTimer = setInterval(advanceFeaturedCarousel, 5700);
 }
 
 window.filterFeatured = function (btn, filter) {
@@ -897,7 +884,6 @@ function renderFooter() {
       <div class="footer-grid">
         <div>
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i data-lucide="chef-hat"></i></div>
             <div>
               <div class="footer-logo-name">Naija Tastee Kitchen</div>
               <div class="footer-logo-tagline">Authentic Nigerian Flavours</div>
